@@ -1,0 +1,45 @@
+Overview
+========
+
+Provides functions to read messages from Event Streams as a stream
+and submit tuples to Event Streams as messages.
+
+`IBM® Event Streams <https://www.ibm.com/cloud/event-streams>`_ is a fully managed, cloud-based messaging service. Built on Apache Kafka, IBM Event Streams is a high-throughput, fault-tolerant, event management platform that helps you build intelligent, responsive, event-driven applications.
+
+Sample
+======
+
+A simple hello world example of a Streams application publishing to a topic and the same application consuming the same topic::
+
+    from streamsx.topology.topology import Topology
+    from streamsx.topology.schema import CommonSchema
+    from streamsx.topology.context import submit
+    import streamsx.eventstreams as eventstreams
+    import time
+
+    def delay (v):
+        time.sleep (5.0)
+        return True
+
+    topo = Topology ('EventStreamsHelloWorld')
+
+    to_evstr = topo.source (['Hello', 'World!'])
+    to_evstr = to_evstr.as_string()
+    # delay tuple by tuple
+    to_evstr = to_evstr.filter (delay)
+
+    # Publish a stream to Event Streams using HELLO topic
+    eventstreams.publish (to_evstr, topic='HELLO')
+
+    # Subscribe to same topic as a stream
+    from_evstr = eventstreams.subscribe (topo, schema=CommonSchema.String, topic='HELLO')
+
+    # You'll find the Hello World! in stdout log file:
+    from_evstr.print()
+
+    submit ('STREAMING_ANALYTICS_SERVICE', topo)
+
+Documentation
+=============
+
+* `streamsx.eventstreams package documentation <http://streamsxeventstreams.readthedocs.io/>`_
