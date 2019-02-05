@@ -8,7 +8,7 @@ The package is uploaded to PyPi in the standard way:
 ```
 cd package
 rm -rf streamsx.eventstreams.egg-info/ build/ dist/
-python setup.py sdist bdist_wheel upload -r pypi`
+python setup.py sdist bdist_wheel upload -r pypi
 ```
 **Note:** This is done using the `ibmstreams` account at pypi.org
 
