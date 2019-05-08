@@ -13,6 +13,7 @@ import os
 import time
 import uuid
 import json
+from streamsx.rest import StreamingAnalyticsConnection
 
 ##
 ## Test assumptions
@@ -142,4 +143,31 @@ class TestMH(TestCase):
         tester.contents(r, expected)
         tester.tuple_count(r, n)
         tester.test(self.test_ctxtype, self.test_config)
+
+#    def test_create_app_config(self):
+#        n = 107
+#        creds_file = os.environ['EVENTSTREAMS_CREDENTIALS']
+#        with open(creds_file) as data_file:
+#            credentials = json.load(data_file)
+#            
+#        print (credentials)
+#        streamingAnalyticsCon = StreamingAnalyticsConnection ()
+#        instance = streamingAnalyticsCon.get_instances()[0]
+#        app_config_name = evstr.configure_connection (instance, credentials = credentials)
+#        print (app_config_name)
+#        topo = Topology()
+#        add_mh_toolkit(topo)
+#        uid = str(uuid.uuid4())
+#        s = topo.source(StringData(uid, n)).as_string()
+#        print ('test_string_creds')
+#        evstr.publish(s, 'MH_TEST', credentials='messagehub')
+
+#        r = evstr.subscribe(topo, 'MH_TEST', CommonSchema.String, credentials='messagehub')
+#        r = r.filter(lambda t : t.startswith(uid))
+#        expected = list(StringData(uid, n, False)())
+
+#        tester = Tester(topo)
+#        tester.contents(r, expected)
+#        tester.tuple_count(r, n)
+#        tester.test(self.test_ctxtype, self.test_config)
 

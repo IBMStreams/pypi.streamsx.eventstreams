@@ -27,7 +27,7 @@ def _add_credentials_file(topology, credentials):
     return 'etc/'+file_name
 
 
-def configure_connection (instance, connection):
+def configure_connection (instance, name = 'messagehub', credentials = None):
     """Configures IBM Streams for a certain connection.
 
 
@@ -44,24 +44,26 @@ def configure_connection (instance, connection):
         cfg = icpd_util.get_service_instance_details (name='your-streams-instance')
         cfg[streamsx.topology.context.ConfigParams.SSL_VERIFY] = False
         instance = Instance.of_service (cfg)
-        connection = icpd_util.get_connection_details (name='your-connection-name')
-        app_cfg = configure_connection (instance, connection)
+        app_cfg = configure_connection (instance, credentials = 'my_crdentials_json')
 
 
     Args:
         instance(streamsx.rest_primitives.Instance): IBM Streams instance object.
-        connection(dict): Bucket name. Bucket must have been created in your Cloud Object Storage service before using this function.
+        name(str): Name of the application configuration, default name is 'messagehub'.
+        credentials(str|dict): The service credentials for Eventstreams.
     Returns:
         Name of the application configuration.
     """
 
-    # check type of connection 
-    # Prepare operator (toolkit) specific properties for application configuration
-    name = connection.connectionName
-    description = 'Config for connection ' + name + ' of type ' + connection.connectionType
-    # retrieve values form connection parameter of type dict (connection.connectionData)
+    description = 'Eventstreams credentials'
     properties = {}
-    properties ['messagehub.creds'] = connection.connectionData ['serviceCredentials']
+    if credentials is None:
+        raise TypeError (credentials)
+    
+    if isinstance (credentials, dict):
+        properties ['messagehub.creds'] = json.dumps (credentials)
+    else:
+        properties ['messagehub.creds'] = credentials
     
     # check if application configuration exists
     app_config = instance.get_application_configurations (name = name)
