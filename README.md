@@ -49,6 +49,7 @@ When the documented sample must be changed, change it here:
 ## Test
 
 Package can be tested with TopologyTester using the Streaming Analytics service and Event Streams service on IBM Cloud.
+Use Python 3.5 for tests with Streaming Analytics!
 
 | Environment variable | content |
 | --- | --- |
@@ -62,7 +63,7 @@ Package can be tested with TopologyTester using the Streaming Analytics service 
 For the tests, an application configuration with name `messagehub` is required. It must contain the
 Event Streams service credentials as `messagehub.creds` property.
 
-For tests with credentiala as dictionary, the environment variable `EVENTSTREAMS_CREDENTIALS` must exist.
+For tests with credentials as dictionary, the environment variable `EVENTSTREAMS_CREDENTIALS` must exist.
 In the Event Streams service, the topic `MH_TEST` with a single partition must be created.
 
 Run the tests with
