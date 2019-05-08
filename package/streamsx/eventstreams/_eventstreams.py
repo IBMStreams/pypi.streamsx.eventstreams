@@ -9,6 +9,12 @@ import streamsx.spl.op
 import streamsx.spl.types
 from streamsx.topology.schema import CommonSchema
 
+def _add_toolkit_dependency (topo):
+    # IMPORTANT: Dependency of this python wrapper to a specific toolkit version
+    # This is important when toolkit is not set with streamsx.spl.toolkit.add_toolkit (selecting toolkit from remote build service)
+    # messagehub toolkit >= 1.7.0 support the 'credentials' parameter were we can pass JSON directly to the operators 
+    streamsx.spl.toolkit.add_toolkit_dependency (topo, 'com.ibm.streamsx.messagehub', '[1.7.0, 3.0.0)')
+
 
 def _add_credentials_file(topology, credentials):
     file_name = 'eventstreams.json'
@@ -21,7 +27,58 @@ def _add_credentials_file(topology, credentials):
     return 'etc/'+file_name
 
 
-def subscribe(topology, topic, schema, group=None, credentials=None, name=None):
+def configure_connection (instance, name = 'messagehub', credentials = None):
+    """Configures IBM Streams for a certain connection.
+
+
+    Creates an application configuration object containing the required properties with connection information.
+
+
+    Example for creating a configuration for a Streams instance with connection details::
+
+
+        streamsx.rest import Instance
+        import streamsx.topology.context
+        from icpd_core import icpd_util
+        
+        cfg = icpd_util.get_service_instance_details (name='your-streams-instance')
+        cfg[streamsx.topology.context.ConfigParams.SSL_VERIFY] = False
+        instance = Instance.of_service (cfg)
+        app_cfg = configure_connection (instance, credentials = 'my_crdentials_json')
+
+
+    Args:
+        instance(streamsx.rest_primitives.Instance): IBM Streams instance object.
+        name(str): Name of the application configuration, default name is 'messagehub'.
+        credentials(str|dict): The service credentials for Eventstreams.
+    Returns:
+        Name of the application configuration.
+    """
+
+    description = 'Eventstreams credentials'
+    properties = {}
+    if credentials is None:
+        raise TypeError (credentials)
+    
+    if isinstance (credentials, dict):
+        properties ['messagehub.creds'] = json.dumps (credentials)
+    else:
+        properties ['messagehub.creds'] = credentials
+    
+    # check if application configuration exists
+    app_config = instance.get_application_configurations (name = name)
+    if app_config:
+        print ('update application configuration: ' + name)
+        app_config[0].update (properties)
+    else:
+        print ('create application configuration: ' + name)
+        instance.create_application_configuration (name, properties, description)
+    return name
+
+
+
+
+def subscribe (topology, topic, schema, group=None, credentials=None, name=None):
     """Subscribe to messages from Event Streams (Message Hub) for a topic.
 
     Adds an Event Streams consumer that subscribes to a topic

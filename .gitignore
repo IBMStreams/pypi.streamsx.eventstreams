@@ -8,4 +8,4 @@
 /package/streamsx.eventstreams.egg-info/
 /package/dist/
 /package/build/
-/.project
+.settings

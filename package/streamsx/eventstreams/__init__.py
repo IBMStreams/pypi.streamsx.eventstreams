@@ -69,7 +69,7 @@ a topic and the same application consuming the same topic::
 
 """
 
-__version__='1.0.0'
+__version__='1.1.0'
 
-__all__ = ['subscribe', 'publish']
-from streamsx.eventstreams._eventstreams import subscribe, publish
+__all__ = ['subscribe', 'publish', 'configure_connection']
+from streamsx.eventstreams._eventstreams import subscribe, publish, configure_connection
