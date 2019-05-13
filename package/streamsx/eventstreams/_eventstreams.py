@@ -146,7 +146,7 @@ def publish(stream, topic, credentials=None, name=None):
     if isinstance(credentials, dict):
          appConfigName = None
 
-    _op = _MessageHubProducer(stream, appConfigName=appConfigName, topic=topic)
+    _op = _MessageHubProducer(stream, appConfigName=appConfigName, topic=topic, name = name)
     _op.params['messageAttribute'] = _op.attribute(stream, msg_attr)
     if isinstance(credentials, dict):
          _op.params['messageHubCredentialsFile'] = _add_credentials_file(stream.topology, credentials)
@@ -196,7 +196,7 @@ class _MessageHubConsumer(streamsx.spl.op.Source):
             params['userLib'] = userLib
         if groupId is not None:
             params['groupId'] = groupId
-        super(_MessageHubConsumer, self).__init__(topology,kind,schemas,params,name)
+        super(_MessageHubConsumer, self).__init__(topology, kind, schemas, params, name)
 
 
 
@@ -227,4 +227,4 @@ class _MessageHubProducer(streamsx.spl.op.Sink):
             params['topic'] = topic
         if userLib is not None:
             params['userLib'] = userLib
-        super(_MessageHubProducer, self).__init__(kind,stream,params,name)
+        super(_MessageHubProducer, self).__init__(kind, stream, params, name)
