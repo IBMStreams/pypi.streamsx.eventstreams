@@ -15,11 +15,6 @@ _SPL_SCHEMA_STRING_MESSAGE_META = 'tuple<rstring message,rstring key,rstring top
 _SPL_SCHEMA_BLOB_MESSAGE_META = 'tuple<blob message,rstring key,rstring topic,int32 partition,int64 offset,int64 messageTimestamp>'
 
 
-
-
-
-
-
 class Schema:
     """
     Structured stream schemas for keyed messages for :py:meth:`~streamsx.eventstreams.subscribe`, 
@@ -44,7 +39,7 @@ class Schema:
     
     
     The following sample uses structured schemas for publishing messages with keys to a 
-    topic in Event Streams, which may be partitioned. Then, it creates a consumer group 
+    potentially partitioned topic in Event Streams. Then, it creates a consumer group 
     that subscribes to the topic, and processes the received messages in parallel channels
     partitioned by the message key::
     

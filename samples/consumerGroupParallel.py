@@ -50,7 +50,7 @@ def string_hashcode(s):
 
 
 topology = Topology('EventStreamsParallel')
-
+event_streams_topic = 'THREE_PARTITIONS_TOPIC'
 #
 # the producer part
 #
@@ -67,7 +67,7 @@ sensorStream = topology.source(
 # assume, we have created an application configuration with name 'messagehub'
 eventStreamsSink = evst.publish(
     sensorStream,
-    topic="threePartitionTopic1",
+    topic=event_streams_topic,
     credentials='messagehub',
     name="SensorPublish")
 
@@ -79,7 +79,7 @@ eventStreamsSink = evst.publish(
 consumerSchema = Schema.StringMessageMeta
 received = evst.subscribe(
     topology,
-    topic="threePartitionTopic1",
+    topic=event_streams_topic,
     schema=consumerSchema,
     group='my_consumer_group',
     credentials='messagehub',

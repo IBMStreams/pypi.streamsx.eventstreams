@@ -96,7 +96,7 @@ def subscribe(topology, topic, schema, group=None, credentials=None, name=None):
         topic(str): Topic to subscribe messages from.
         schema(StreamSchema): Schema for returned stream.
         group(str): Kafka consumer group identifier. When not specified it default to the job name with `topic` appended separated by an underscore.
-        credentials(str|dict): Credentials in JSON or name of the application configuration containing the credentials for the Event Streams service. When set to ``None`` the application configuration ``messagehub`` is used.
+        credentials(dict|str): Credentials in JSON or name of the application configuration containing the credentials for the Event Streams service. When set to ``None`` the application configuration ``messagehub`` is used.
         name(str): Consumer name in the Streams context, defaults to a generated name.
 
     Returns:
@@ -108,12 +108,16 @@ def subscribe(topology, topic, schema, group=None, credentials=None, name=None):
     elif schema is CommonSchema.String:
         msg_attr_name = 'string'
     elif schema is Schema.BinaryMessage:
+        # msg_attr_name = 'message'
         pass
     elif schema is Schema.StringMessage:
+        # msg_attr_name = 'message'
         pass
     elif schema is Schema.BinaryMessageMeta:
+        # msg_attr_name = 'message'
         pass
     elif schema is Schema.StringMessageMeta:
+        # msg_attr_name = 'message'
         pass
     else:
         raise TypeError(schema)
@@ -138,7 +142,7 @@ def subscribe(topology, topic, schema, group=None, credentials=None, name=None):
 
 
 def publish(stream, topic, credentials=None, name=None):
-    """Publish Event Streams (Message Hub) messages to a topic.
+    """Publish Event Streams messages to a topic.
 
     Adds an Event Streams producer where each tuple on `stream` is
     published as a message into IBM Event Streams cloud service.
@@ -146,22 +150,24 @@ def publish(stream, topic, credentials=None, name=None):
     Args:
         stream(Stream): Stream of tuples to published as messages.
         topic(str): Topic to publish messages to.
-        credentials(str|dict): Credentials in JSON or name of the application configuration containing the credentials for the Event Streams service. When set to ``None`` the application configuration ``messagehub`` is used.
+        credentials(dict|str): Credentials in JSON or name of the application configuration containing the credentials for the Event Streams service. When set to ``None`` the application configuration ``messagehub`` is used.
         name(str): Producer name in the Streams context, defaults to a generated name.
 
     Returns:
         streamsx.topology.topology.Sink: Stream termination.
     """
-    msg_attr = None
+    msg_attr_name = None
     streamSchema = stream.oport.schema
     if streamSchema == CommonSchema.Json:
-        msg_attr = 'jsonString'
+        msg_attr_name = 'jsonString'
     elif streamSchema == CommonSchema.String:
-        msg_attr = 'string'
+        msg_attr_name = 'string'
     elif streamSchema is Schema.BinaryMessage:
+        # msg_attr_name = 'message'
         pass
     elif streamSchema is Schema.StringMessage:
-        msg_attr = 'message'
+        # msg_attr_name = 'message'
+        pass
     else:
         raise TypeError(streamSchema)
 
@@ -171,7 +177,7 @@ def publish(stream, topic, credentials=None, name=None):
     else:
         appConfigName = credentials
 
-    _op = _MessageHubProducer(stream, appConfigName=appConfigName, topic=topic, messageAttributeName=msg_attr, name=name)
+    _op = _MessageHubProducer(stream, appConfigName=appConfigName, topic=topic, messageAttributeName=msg_attr_name, name=name)
     if appConfigName is None:
         _op.params['messageHubCredentialsFile'] = _add_credentials_file(stream.topology, credentials)
 
@@ -224,7 +230,7 @@ class _MessageHubConsumer(streamsx.spl.op.Source):
 
 
 class _MessageHubProducer(streamsx.spl.op.Sink):
-    def __init__(self, stream, vmArg=None, appConfigName=None, keyAttributeName=None, messageAttributeName=None, messageHubCredentialsFile=None, partitionAttribute=None, propertiesFile=None, timestampAttribute=None, topicAttribute=None, topic=None, userLib=None, name=None):
+    def __init__(self, stream, vmArg=None, appConfigName=None, keyAttributeName=None, messageAttributeName=None, messageHubCredentialsFile=None, partitionAttributeName=None, propertiesFile=None, timestampAttributeName=None, topicAttributeName=None, topic=None, userLib=None, name=None):
         # topology = stream.topology
         kind = "com.ibm.streamsx.messagehub::MessageHubProducer"
         params = dict()
@@ -234,14 +240,8 @@ class _MessageHubProducer(streamsx.spl.op.Sink):
             params['appConfigName'] = appConfigName
         if messageHubCredentialsFile is not None:
             params['messageHubCredentialsFile'] = messageHubCredentialsFile
-        if partitionAttribute is not None:
-            params['partitionAttribute'] = partitionAttribute
         if propertiesFile is not None:
             params['propertiesFile'] = propertiesFile
-        if timestampAttribute is not None:
-            params['timestampAttribute'] = timestampAttribute
-        if topicAttribute is not None:
-            params['topicAttribute'] = topicAttribute
         if topic is not None:
             params['topic'] = topic
         if userLib is not None:
@@ -252,3 +252,9 @@ class _MessageHubProducer(streamsx.spl.op.Sink):
             params['messageAttribute'] = self.attribute(stream, messageAttributeName)
         if keyAttributeName is not None:
             params['keyAttribute'] = self.attribute(stream, keyAttributeName)
+        if partitionAttributeName is not None:
+            params['partitionAttribute'] = self.attribute(stream, partitionAttributeName)
+        if timestampAttributeName is not None:
+            params['timestampAttribute'] = self.attribute(stream, timestampAttributeName)
+        if topicAttributeName is not None:
+            params['topicAttribute'] = self.attribute(stream, topicAttributeName)

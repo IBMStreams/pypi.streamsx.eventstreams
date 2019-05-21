@@ -60,7 +60,7 @@ class TestPublishParams(TestCase):
     def test_schemas_ok(self):
         topo = Topology()
         pyObjStream = topo.source(['Hello', 'World!'])
-        jsonStream = pyObjStream.as_json()  #map (func=lambda s: {"p": 3, 's': s}, schema=CommonSchema.Json)
+        jsonStream = pyObjStream.as_json()
         stringStream = pyObjStream.as_string()
         binMsgStream = pyObjStream.map (func=lambda s: {'message': bytes(s, 'utf-8'), 'key': s}, schema=MsgSchema.BinaryMessage)
         strMsgStream = pyObjStream.map (func=lambda s: {'message': s, 'key': s}, schema=MsgSchema.StringMessage)
@@ -79,13 +79,13 @@ class TestPublishParams(TestCase):
         otherSplTupleStream1 = pyObjStream.map (schema=StreamSchema('tuple<int32 a>'))
         otherSplTupleStream2 = pyObjStream.map (schema='tuple<int32 a>')
         
-        self.assertRaises(TypeError, evstr.publish, pyObjStream, 'Topic')
-        self.assertRaises(TypeError, evstr.publish, binStream, 'Topic')
-        self.assertRaises(TypeError, evstr.publish, xmlStream, 'Topic')
-        self.assertRaises(TypeError, evstr.publish, binMsgMetaStream, 'Topic')
-        self.assertRaises(TypeError, evstr.publish, strMsgMetaStream, 'Topic')
-        self.assertRaises(TypeError, evstr.publish, otherSplTupleStream1, 'Topic')
-        self.assertRaises(TypeError, evstr.publish, otherSplTupleStream2, 'Topic')
+        self.assertRaises(TypeError, evstr.publish, pyObjStream, "Topic")
+        self.assertRaises(TypeError, evstr.publish, binStream, "Topic")
+        self.assertRaises(TypeError, evstr.publish, xmlStream, "Topic")
+        self.assertRaises(TypeError, evstr.publish, binMsgMetaStream, "Topic")
+        self.assertRaises(TypeError, evstr.publish, strMsgMetaStream, "Topic")
+        self.assertRaises(TypeError, evstr.publish, otherSplTupleStream1, "Topic")
+        self.assertRaises(TypeError, evstr.publish, otherSplTupleStream2, "Topic")
 
     def test_creds(self):
         creds_file = os.environ['EVENTSTREAMS_CREDENTIALS']
