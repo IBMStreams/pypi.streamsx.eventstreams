@@ -7,6 +7,7 @@ IBM Streams Event Streams integration
 =====================================
 
 .. automodule:: streamsx.eventstreams
+.. automodule:: streamsx.eventstreams.schema
 
 Indices and tables
 ==================

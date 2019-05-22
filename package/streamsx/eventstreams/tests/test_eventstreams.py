@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 import streamsx.eventstreams as evstr
-
+from streamsx.eventstreams.schema import Schema as MsgSchema
 from streamsx.topology.topology import Topology
 from streamsx.topology.tester import Tester
 from streamsx.topology.schema import CommonSchema, StreamSchema
@@ -35,6 +35,10 @@ class TestSubscribeParams(TestCase):
         topo = Topology()
         evstr.subscribe(topo, 'T1', CommonSchema.String)
         evstr.subscribe(topo, 'T1', CommonSchema.Json)
+        evstr.subscribe(topo, 'T1', MsgSchema.StringMessage)
+        evstr.subscribe(topo, 'T1', MsgSchema.BinaryMessage)
+        evstr.subscribe(topo, 'T1', MsgSchema.StringMessageMeta)
+        evstr.subscribe(topo, 'T1', MsgSchema.BinaryMessageMeta)
 
     def test_schemas_bad(self):
         topo = Topology()
@@ -51,6 +55,46 @@ class TestSubscribeParams(TestCase):
         topo = Topology()
         evstr.subscribe(topo, 'T1', CommonSchema.String, credentials=credentials)
         evstr.subscribe(topo, 'T1', CommonSchema.String, credentials='eventstreams')
+
+class TestPublishParams(TestCase):
+    def test_schemas_ok(self):
+        topo = Topology()
+        pyObjStream = topo.source(['Hello', 'World!'])
+        jsonStream = pyObjStream.as_json()
+        stringStream = pyObjStream.as_string()
+        binMsgStream = pyObjStream.map (func=lambda s: {'message': bytes(s, 'utf-8'), 'key': s}, schema=MsgSchema.BinaryMessage)
+        strMsgStream = pyObjStream.map (func=lambda s: {'message': s, 'key': s}, schema=MsgSchema.StringMessage)
+        evstr.publish (binMsgStream, "Topic")
+        evstr.publish (strMsgStream, "Topic")
+        evstr.publish (stringStream, "Topic")
+        evstr.publish (jsonStream, "Topic")
+
+    def test_schemas_bad(self):
+        topo = Topology()
+        pyObjStream = topo.source(['Hello', 'World!'])
+        binStream = pyObjStream.map (func=lambda s: bytes ("ABC", utf-8), schema=CommonSchema.Binary)
+        xmlStream = pyObjStream.map (schema=CommonSchema.XML)
+        binMsgMetaStream = pyObjStream.map (func=lambda s: {'message': bytes(s, 'utf-8'), 'key': s}, schema=MsgSchema.BinaryMessageMeta)
+        strMsgMetaStream = pyObjStream.map (func=lambda s: {'message': s, 'key': s}, schema=MsgSchema.StringMessageMeta)
+        otherSplTupleStream1 = pyObjStream.map (schema=StreamSchema('tuple<int32 a>'))
+        otherSplTupleStream2 = pyObjStream.map (schema='tuple<int32 a>')
+        
+        self.assertRaises(TypeError, evstr.publish, pyObjStream, "Topic")
+        self.assertRaises(TypeError, evstr.publish, binStream, "Topic")
+        self.assertRaises(TypeError, evstr.publish, xmlStream, "Topic")
+        self.assertRaises(TypeError, evstr.publish, binMsgMetaStream, "Topic")
+        self.assertRaises(TypeError, evstr.publish, strMsgMetaStream, "Topic")
+        self.assertRaises(TypeError, evstr.publish, otherSplTupleStream1, "Topic")
+        self.assertRaises(TypeError, evstr.publish, otherSplTupleStream2, "Topic")
+
+    def test_creds(self):
+        creds_file = os.environ['EVENTSTREAMS_CREDENTIALS']
+        with open(creds_file) as data_file:
+            credentials = json.load(data_file)
+        topo = Topology()
+        stream = topo.source (['Hello', 'World']).as_json()
+        evstr.publish (stream, 'Topic', credentials=credentials)
+        evstr.publish (stream, 'Topic', credentials='eventstreams')
 
 ## Using a uuid to avoid concurrent test runs interferring
 ## with each other
