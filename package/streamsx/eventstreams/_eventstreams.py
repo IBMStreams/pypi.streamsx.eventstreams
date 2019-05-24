@@ -177,15 +177,45 @@ def publish(stream, topic, credentials=None, name=None):
     else:
         appConfigName = credentials
 
-    _op = _MessageHubProducer(stream, appConfigName=appConfigName, topic=topic, messageAttributeName=msg_attr_name, name=name)
+    _op = _MessageHubProducer(stream, appConfigName=appConfigName, topic=topic, name=name)
     if appConfigName is None:
         _op.params['messageHubCredentialsFile'] = _add_credentials_file(stream.topology, credentials)
+
+    # create the input attribute expressions after operator _op initialization
+    if msg_attr_name is not None:
+        _op.params['messageAttribute'] = _op.attribute(stream, msg_attr_name)
+#    if keyAttributeName is not None:
+#        params['keyAttribute'] = _op.attribute(stream, keyAttributeName)
+#    if partitionAttributeName is not None:
+#        params['partitionAttribute'] = _op.attribute(stream, partitionAttributeName)
+#    if timestampAttributeName is not None:
+#        params['timestampAttribute'] = _op.attribute(stream, timestampAttributeName)
+#    if topicAttributeName is not None:
+#        params['topicAttribute'] = _op.attribute(stream, topicAttributeName)
 
     return streamsx.topology.topology.Sink(_op)
 
 
 class _MessageHubConsumer(streamsx.spl.op.Source):
-    def __init__(self, topology, schema, vmArg=None, appConfigName=None, clientId=None, messageHubCredentialsFile=None, outputKeyAttributeName=None, outputMessageAttributeName=None, outputTimestampAttributeName=None, outputOffsetAttributeName=None, outputPartitionAttributeName=None, outputTopicAttributeName=None, partition=None, propertiesFile=None, startPosition=None, startTime=None, topic=None, triggerCount=None, userLib=None, groupId=None, name=None):
+    def __init__(self, topology, schema,
+                 vmArg=None,
+                 appConfigName=None,
+                 clientId=None,
+                 messageHubCredentialsFile=None,
+                 outputKeyAttributeName=None,
+                 outputMessageAttributeName=None,
+                 outputTimestampAttributeName=None,
+                 outputOffsetAttributeName=None,
+                 outputPartitionAttributeName=None,
+                 outputTopicAttributeName=None,
+                 partition=None,
+                 propertiesFile=None,
+                 startPosition=None,
+                 startTime=None,topic=None,
+                 triggerCount=None,
+                 userLib=None,
+                 groupId=None,
+                 name=None):
         kind = "com.ibm.streamsx.messagehub::MessageHubConsumer"
         # inputs = None
         schemas = schema
@@ -230,7 +260,14 @@ class _MessageHubConsumer(streamsx.spl.op.Source):
 
 
 class _MessageHubProducer(streamsx.spl.op.Sink):
-    def __init__(self, stream, vmArg=None, appConfigName=None, keyAttributeName=None, messageAttributeName=None, messageHubCredentialsFile=None, partitionAttributeName=None, propertiesFile=None, timestampAttributeName=None, topicAttributeName=None, topic=None, userLib=None, name=None):
+    def __init__(self, stream,
+                 vmArg=None,
+                 appConfigName=None,
+                 messageHubCredentialsFile=None,
+                 propertiesFile=None,
+                 topic=None,
+                 userLib=None,
+                 name=None):
         # topology = stream.topology
         kind = "com.ibm.streamsx.messagehub::MessageHubProducer"
         params = dict()
@@ -247,14 +284,3 @@ class _MessageHubProducer(streamsx.spl.op.Sink):
         if userLib is not None:
             params['userLib'] = userLib
         super(_MessageHubProducer, self).__init__(kind, stream, params, name)
-        # create the input attribute expressions after base class initialization
-        if messageAttributeName is not None:
-            params['messageAttribute'] = self.attribute(stream, messageAttributeName)
-        if keyAttributeName is not None:
-            params['keyAttribute'] = self.attribute(stream, keyAttributeName)
-        if partitionAttributeName is not None:
-            params['partitionAttribute'] = self.attribute(stream, partitionAttributeName)
-        if timestampAttributeName is not None:
-            params['timestampAttribute'] = self.attribute(stream, timestampAttributeName)
-        if topicAttributeName is not None:
-            params['topicAttribute'] = self.attribute(stream, topicAttributeName)
