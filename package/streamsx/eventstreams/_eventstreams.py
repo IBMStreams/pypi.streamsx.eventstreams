@@ -23,6 +23,8 @@ def _add_credentials_file(topology, credentials):
     The file contains the credentials as JSON.
     The filename in the bundle is ``etc/eventstreams.json``.
     """
+    if credentials is None:
+        raise TypeError(credentials)
     file_name = 'eventstreams.json'
     tmpdirname = gettempdir()
     tmpfile = tmpdirname + '/' + file_name
@@ -30,7 +32,9 @@ def _add_credentials_file(topology, credentials):
         json_file.write(json.dumps(credentials))
 
     topology.add_file_dependency(tmpfile, 'etc')
-    return 'etc/'+file_name
+    fName = 'etc/'+file_name
+    print("Adding file dependency " + fName + " to the topology " + topology.name)
+    return fName
 
 
 def configure_connection(instance, name='messagehub', credentials=None):
@@ -102,6 +106,8 @@ def subscribe(topology, topic, schema, group=None, credentials=None, name=None):
     Returns:
          Stream: Stream containing messages.
     """
+    if topic is None:
+        raise TypeError(topic)
     msg_attr_name = None
     if schema is CommonSchema.Json:
         msg_attr_name = 'jsonString'
@@ -120,7 +126,7 @@ def subscribe(topology, topic, schema, group=None, credentials=None, name=None):
         # msg_attr_name = 'message'
         pass
     else:
-        raise TypeError(schema)
+        raise ValueError(schema)
 
     if group is None:
         group = streamsx.spl.op.Expression.expression('getJobName() + "_" + "' + str(topic) + '"')
@@ -135,7 +141,7 @@ def subscribe(topology, topic, schema, group=None, credentials=None, name=None):
         appConfigName = credentials
 
     _op = _MessageHubConsumer(topology, schema=schema, outputMessageAttributeName=msg_attr_name, appConfigName=appConfigName, topic=topic, groupId=group, name=name)
-    if appConfigName is None:
+    if (appConfigName is None) and (credentials is not None):
         _op.params['messageHubCredentialsFile'] = _add_credentials_file(topology, credentials)
 
     return _op.stream
@@ -156,6 +162,8 @@ def publish(stream, topic, credentials=None, name=None):
     Returns:
         streamsx.topology.topology.Sink: Stream termination.
     """
+    if topic is None:
+        raise TypeError(topic)
     msg_attr_name = None
     streamSchema = stream.oport.schema
     if streamSchema == CommonSchema.Json:
@@ -169,7 +177,7 @@ def publish(stream, topic, credentials=None, name=None):
         # msg_attr_name = 'message'
         pass
     else:
-        raise TypeError(streamSchema)
+        raise ValueError(streamSchema)
 
     # check if it's the credentials for the service
     if isinstance(credentials, dict):
@@ -178,7 +186,7 @@ def publish(stream, topic, credentials=None, name=None):
         appConfigName = credentials
 
     _op = _MessageHubProducer(stream, appConfigName=appConfigName, topic=topic, name=name)
-    if appConfigName is None:
+    if (appConfigName is None) and (credentials is not None):
         _op.params['messageHubCredentialsFile'] = _add_credentials_file(stream.topology, credentials)
 
     # create the input attribute expressions after operator _op initialization
