@@ -64,7 +64,7 @@ def configure_connection(instance, name='messagehub', credentials=None):
     Returns:
         Name of the application configuration.
 
-    .. warning:: The function can be used only in IBM Cloud Private for Data
+    .. warning:: The function can be used only in IBM Cloud Pak for Data.
     .. versionadded:: 1.1
     """
 

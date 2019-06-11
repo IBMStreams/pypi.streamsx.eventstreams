@@ -122,8 +122,17 @@ class StringData(object):
         for i in range(self.count):
             yield self.prefix + '_' + str(i)
 
+def get_toolkit_home():
+    result = None
+    try:
+        result = os.environ['EVENTSTREAMS_TOOLKIT_HOME']
+    except KeyError: 
+        result = None
+    return result
+
 def add_mh_toolkit(topo):
-    streamsx.spl.toolkit.add_toolkit(topo, os.environ["EVENTSTREAMS_TOOLKIT_HOME"])
+    if get_toolkit_home() is not None:
+        streamsx.spl.toolkit.add_toolkit(topo, get_toolkit_home())
 
 
 class TestMH(TestCase):
@@ -215,3 +224,16 @@ class TestMH(TestCase):
 #        tester.tuple_count(r, n)
 #        tester.test(self.test_ctxtype, self.test_config)
 
+class TestICPRemote(TestMH):
+    def setUp(self):
+        Tester.setup_distributed(self)
+        self.toolkit_home = None
+        # setup test config
+        self.test_config = {}
+        job_config = streamsx.topology.context.JobConfig(tracing='info')
+        job_config.add(self.test_config)
+        self.test_config[streamsx.topology.context.ConfigParams.SSL_VERIFY] = False 
+
+    @classmethod
+    def setUpClass(self):
+        super().setUpClass()
