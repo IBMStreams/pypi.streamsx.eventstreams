@@ -7,13 +7,16 @@ from streamsx.topology.tester import Tester
 from streamsx.topology.schema import CommonSchema, StreamSchema
 
 import streamsx.spl.toolkit
+from streamsx.rest import StreamingAnalyticsConnection
 
 import datetime
 import os
 import time
 import uuid
 import json
-from streamsx.rest import StreamingAnalyticsConnection
+from tempfile import gettempdir
+import glob
+import shutil
 
 ##
 ## Test assumptions
@@ -55,6 +58,57 @@ class TestSubscribeParams(TestCase):
         topo = Topology()
         evstr.subscribe(topo, 'T1', CommonSchema.String, credentials=credentials)
         evstr.subscribe(topo, 'T1', CommonSchema.String, credentials='eventstreams')
+
+
+class TestDownloadToolkit(TestCase):
+    @classmethod
+    def tearDownClass(cls):
+        # delete downloaded *.tgz (should be deleted in _download_toolkit(...)
+        for f in glob.glob(gettempdir() + '/toolkit-[0-9]*.tgz'):
+            try:
+                os.remove(f)
+                print ('file removed: ' + f)
+            except:
+                print('Error deleting file: ', f)
+        # delete unpacked toolkits
+        for d in glob.glob(gettempdir() + '/pypi.streamsx.eventstreams.tests-*'):
+            if os.path.isdir(d):
+                shutil.rmtree(d)
+        for d in glob.glob(gettempdir() + '/com.ibm.streamsx.messagehub'):
+            if os.path.isdir(d):
+                shutil.rmtree(d)
+
+    def test_download_latest(self):
+        topology = Topology()
+        location = evstr.download_toolkit()
+        print('toolkit location: ' + location)
+        streamsx.spl.toolkit.add_toolkit(topology, location)
+
+    def test_download_with_url(self):
+        topology = Topology()
+        ver = '1.8.0'
+        url = 'https://github.com/IBMStreams/streamsx.messagehub/releases/download/v' + ver + '/com.ibm.streamsx.messagehub-' + ver + '.tgz'
+        location = evstr.download_toolkit(url=url)
+        print('toolkit location: ' + location)
+        streamsx.spl.toolkit.add_toolkit(topology, location)
+
+    def test_download_latest_with_target_dir(self):
+        topology = Topology()
+        target_dir = 'pypi.streamsx.eventstreams.tests-' + str(uuid.uuid4()) + '/messagehub-toolkit'
+        location = evstr.download_toolkit(target_dir=target_dir)
+        print('toolkit location: ' + location)
+        streamsx.spl.toolkit.add_toolkit(topology, location)
+
+    def test_download_with_url_and_target_dir(self):
+        topology = Topology()
+        target_dir = 'pypi.streamsx.eventstreams.tests-' + str(uuid.uuid4()) + '/messagehub-toolkit'
+        ver = '1.9.0'
+        url = 'https://github.com/IBMStreams/streamsx.messagehub/releases/download/v' + ver + '/com.ibm.streamsx.messagehub-' + ver + '.tgz'
+        location = evstr.download_toolkit(url=url, target_dir=target_dir)
+        print('toolkit location: ' + location)
+        streamsx.spl.toolkit.add_toolkit(topology, location)
+
+
 
 class TestPublishParams(TestCase):
     def test_schemas_ok(self):
