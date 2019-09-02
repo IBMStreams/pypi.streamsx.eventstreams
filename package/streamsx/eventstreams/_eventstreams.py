@@ -40,7 +40,7 @@ def _add_credentials_file(topology, credentials):
     return fName
 
 
-def download_toolkit(url=None, name=None):
+def download_toolkit(url=None, target_dir=None):
     r"""Downloads the latest streamsx.messagehub toolkit from GitHub.
 
     Example for updating the toolkit for your topology with the latest toolkit from GitHub::
@@ -61,8 +61,9 @@ def download_toolkit(url=None, name=None):
     Args:
         url(str): Link to toolkit archive (\*.tgz) to be downloaded. Use this parameter to 
             download a specific version of the toolkit.
-        name(str): the directory where the toolkit is unpacked to. If it is a relative path,
-            the path is treated as relative to to the system temporary directory, for example relative to /tmp on Unix/Linux systems.
+        target_dir(str): the directory where the toolkit is unpacked to. If a relative path is given,
+            the path is appended to the system temporary directory, for example to /tmp on Unix/Linux systems.
+            If target_dir is ``None`` a location relative to the system temporary directory is chosen.
 
     Returns:
         str: the location of the downloaded streamsx.messagehub toolkit
@@ -70,7 +71,7 @@ def download_toolkit(url=None, name=None):
     .. note:: This function requires an outgoing Internet connection
     .. versionadded:: 1.3
     """
-    _toolkit_location = streamsx.toolkits.download_toolkit (toolkit_name=_TOOLKIT_NAME, url=url, target_dir=name)
+    _toolkit_location = streamsx.toolkits.download_toolkit (toolkit_name=_TOOLKIT_NAME, url=url, target_dir=target_dir)
     return _toolkit_location
 
 

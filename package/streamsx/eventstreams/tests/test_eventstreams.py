@@ -95,7 +95,7 @@ class TestDownloadToolkit(TestCase):
     def test_download_latest_with_target_dir(self):
         topology = Topology()
         target_dir = 'pypi.streamsx.eventstreams.tests-' + str(uuid.uuid4()) + '/messagehub-toolkit'
-        location = evstr.download_toolkit(name=target_dir)
+        location = evstr.download_toolkit(target_dir=target_dir)
         print('toolkit location: ' + location)
         streamsx.spl.toolkit.add_toolkit(topology, location)
 
@@ -104,7 +104,7 @@ class TestDownloadToolkit(TestCase):
         target_dir = 'pypi.streamsx.eventstreams.tests-' + str(uuid.uuid4()) + '/messagehub-toolkit'
         ver = '1.9.0'
         url = 'https://github.com/IBMStreams/streamsx.messagehub/releases/download/v' + ver + '/com.ibm.streamsx.messagehub-' + ver + '.tgz'
-        location = evstr.download_toolkit(url=url, name=target_dir)
+        location = evstr.download_toolkit(url=url, target_dir=target_dir)
         print('toolkit location: ' + location)
         streamsx.spl.toolkit.add_toolkit(topology, location)
 
