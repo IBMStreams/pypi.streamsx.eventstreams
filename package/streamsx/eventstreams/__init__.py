@@ -95,7 +95,12 @@ a topic and the same application consuming the same topic::
 
 """
 
-__version__ = '1.2.4'
+__version__ = '1.3.0'
 
-__all__ = ['subscribe', 'publish', 'configure_connection']
-from streamsx.eventstreams._eventstreams import subscribe, publish, configure_connection
+__all__ = [
+    'download_toolkit',
+    'configure_connection',
+    'subscribe',
+    'publish'
+    ]
+from streamsx.eventstreams._eventstreams import subscribe, publish, configure_connection, download_toolkit

@@ -8,13 +8,16 @@ import streamsx.spl.op
 import streamsx.spl.types
 from streamsx.topology.schema import CommonSchema
 from streamsx.eventstreams.schema import Schema
+from streamsx.toolkits import download_toolkit
+
+_TOOLKIT_NAME = 'com.ibm.streamsx.messagehub'
 
 
 def _add_toolkit_dependency(topo):
     # IMPORTANT: Dependency of this python wrapper to a specific toolkit version
     # This is important when toolkit is not set with streamsx.spl.toolkit.add_toolkit (selecting toolkit from remote build service)
     # messagehub toolkit >= 1.7.0 support the 'credentials' parameter were we can pass JSON directly to the operators
-    streamsx.spl.toolkit.add_toolkit_dependency(topo, 'com.ibm.streamsx.messagehub', '[1.7.0, 3.0.0)')
+    streamsx.spl.toolkit.add_toolkit_dependency(topo, _TOOLKIT_NAME, '[1.7.0, 3.0.0)')
 
 
 def _add_credentials_file(topology, credentials):
@@ -35,6 +38,40 @@ def _add_credentials_file(topology, credentials):
     fName = 'etc/'+file_name
     print("Adding file dependency " + fName + " to the topology " + topology.name)
     return fName
+
+
+def download_toolkit(url=None, name=None):
+    r"""Downloads the latest streamsx.messagehub toolkit from GitHub.
+
+    Example for updating the toolkit for your topology with the latest toolkit from GitHub::
+
+        import streamsx.eventstreams as es
+        # download the toolkit from GitHub
+        toolkit_location = es.download_toolkit()
+        # add the toolkit to topology
+        streamsx.spl.toolkit.add_toolkit(topology, toolkit_location)
+
+    Example for updating the topology with a specific version of the streamsx.messagehub toolkit using an URL::
+
+        import streamsx.eventstreams as es
+        url202 = 'https://github.com/IBMStreams/streamsx.messagehub/releases/download/v2.0.2/com.ibm.streamsx.messagehub-2.0.2.tgz'
+        toolkit_location = es.download_toolkit(url=url202)
+        streamsx.spl.toolkit.add_toolkit(topology, toolkit_location)
+
+    Args:
+        url(str): Link to toolkit archive (\*.tgz) to be downloaded. Use this parameter to 
+            download a specific version of the toolkit.
+        name(str): the directory where the toolkit is unpacked to. If it is a relative path,
+            the path is treated as relative to to the system temporary directory, for example relative to /tmp on Unix/Linux systems.
+
+    Returns:
+        str: the location of the downloaded streamsx.messagehub toolkit
+
+    .. note:: This function requires an outgoing Internet connection
+    .. versionadded:: 1.3
+    """
+    _toolkit_location = streamsx.toolkits.download_toolkit (toolkit_name=_TOOLKIT_NAME, url=url, target_dir=name)
+    return _toolkit_location
 
 
 def configure_connection(instance, name='messagehub', credentials=None):
