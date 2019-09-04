@@ -95,7 +95,7 @@ a topic and the same application consuming the same topic::
 
 """
 
-__version__ = '1.3.0'
+__version__ = '1.3.1'
 
 __all__ = [
     'download_toolkit',
