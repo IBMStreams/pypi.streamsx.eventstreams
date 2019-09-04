@@ -85,7 +85,7 @@ def configure_connection(instance, name='messagehub', credentials=None):
     Example for creating a configuration for a Streams instance with connection details::
 
 
-        streamsx.rest import Instance
+        from streamsx.rest import Instance
         import streamsx.topology.context
         from icpd_core import icpd_util
 
