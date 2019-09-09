@@ -60,6 +60,12 @@ Use Python 3.5 for tests with Streaming Analytics!
 | EVENTSTREAMS_CREDENTIALS | The name of a JSON file with Event Streams service credentials |
 | JAVA_HOME | Java Home, at least Java 1.8, required for remote build |
 
+
+Uninstall the streamsx.eventstreams package from your Python environment before test:
+
+`pip uninstall streamsx.kafka --yes`
+
+
 For the tests, an application configuration with name `messagehub` is required. It must contain the
 Event Streams service credentials as `messagehub.creds` property.
 
