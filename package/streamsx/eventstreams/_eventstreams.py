@@ -17,7 +17,7 @@ def _add_toolkit_dependency(topo):
     # IMPORTANT: Dependency of this python wrapper to a specific toolkit version
     # This is important when toolkit is not set with streamsx.spl.toolkit.add_toolkit (selecting toolkit from remote build service)
     # messagehub toolkit >= 1.7.0 support the 'credentials' parameter were we can pass JSON directly to the operators
-    streamsx.spl.toolkit.add_toolkit_dependency(topo, _TOOLKIT_NAME, '[1.7.0, 3.0.0)')
+    streamsx.spl.toolkit.add_toolkit_dependency(topo, _TOOLKIT_NAME, '[1.7.0,99.0.0)')
 
 
 def _add_credentials_file(topology, credentials):
