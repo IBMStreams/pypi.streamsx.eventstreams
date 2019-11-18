@@ -42,7 +42,7 @@ When the development status changes, edit the *classifiers* in
 
 When the documented sample must be changed, change it here:
 
-- ./package/streamsx/kafka/\_\_init\_\_.py
+- ./package/streamsx/eventstreams/\_\_init\_\_.py
 - ./package/DESC.txt
 
 
@@ -59,6 +59,12 @@ Use Python 3.5 for tests with Streaming Analytics!
 | EVENTSTREAMS_TOOLKIT_HOME | The directory where the MessageHub toolkit is located |
 | EVENTSTREAMS_CREDENTIALS | The name of a JSON file with Event Streams service credentials |
 | JAVA_HOME | Java Home, at least Java 1.8, required for remote build |
+
+
+Uninstall the `streamsx.eventstreams` package from your Python environment before test:
+
+`pip uninstall streamsx.eventstreams --yes`
+
 
 For the tests, an application configuration with name `messagehub` is required. It must contain the
 Event Streams service credentials as `messagehub.creds` property.
