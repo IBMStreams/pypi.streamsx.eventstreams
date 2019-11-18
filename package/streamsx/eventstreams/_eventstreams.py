@@ -6,6 +6,7 @@ from tempfile import gettempdir
 import json
 import streamsx.spl.op
 import streamsx.spl.types
+import random
 from streamsx.topology.schema import CommonSchema
 from streamsx.eventstreams.schema import Schema
 from streamsx.toolkits import download_toolkit
@@ -17,7 +18,11 @@ def _add_toolkit_dependency(topo):
     # IMPORTANT: Dependency of this python wrapper to a specific toolkit version
     # This is important when toolkit is not set with streamsx.spl.toolkit.add_toolkit (selecting toolkit from remote build service)
     # messagehub toolkit >= 1.7.0 support the 'credentials' parameter were we can pass JSON directly to the operators
-    streamsx.spl.toolkit.add_toolkit_dependency(topo, _TOOLKIT_NAME, '[1.7.0, 3.0.0)')
+    streamsx.spl.toolkit.add_toolkit_dependency(topo, _TOOLKIT_NAME, '[1.7.0,99.0.0]')
+
+
+def _generate_random_digits(len=10):
+    return ''.join(random.choice(string.digits) for _ in range(len))
 
 
 def _add_credentials_file(topology, credentials):
@@ -28,7 +33,7 @@ def _add_credentials_file(topology, credentials):
     """
     if credentials is None:
         raise TypeError(credentials)
-    file_name = 'eventstreams.json'
+    file_name = 'eventstreams-' + _generate_random_digits(12) + '.json'
     tmpdirname = gettempdir()
     tmpfile = tmpdirname + '/' + file_name
     with open(tmpfile, "w") as json_file:
