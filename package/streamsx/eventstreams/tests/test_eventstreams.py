@@ -184,6 +184,9 @@ def get_toolkit_home():
         result = None
     return result
 
+def add_pip_toolkits(topo):
+    topo.add_pip_package('streamsx.toolkits')
+
 def add_mh_toolkit(topo):
     if get_toolkit_home() is not None:
         streamsx.spl.toolkit.add_toolkit(topo, get_toolkit_home())
@@ -198,6 +201,7 @@ class TestMH(TestCase):
         n = 104
         topo = Topology()
         add_mh_toolkit(topo)
+        add_pip_toolkits(topo)
         uid = str(uuid.uuid4())
         s = topo.source(JsonData(uid, n)).as_json()
         evstr.publish(s, 'MH_TEST')
@@ -216,6 +220,7 @@ class TestMH(TestCase):
         n = 107
         topo = Topology()
         add_mh_toolkit(topo)
+        add_pip_toolkits(topo)
         uid = str(uuid.uuid4())
         s = topo.source(StringData(uid, n)).as_string()
         evstr.publish(s, 'MH_TEST')
@@ -237,6 +242,7 @@ class TestMH(TestCase):
             credentials = json.load(data_file)
         topo = Topology()
         add_mh_toolkit(topo)
+        add_pip_toolkits(topo)
         uid = str(uuid.uuid4())
         s = topo.source(StringData(uid, n)).as_string()
         print ('test_string_creds')

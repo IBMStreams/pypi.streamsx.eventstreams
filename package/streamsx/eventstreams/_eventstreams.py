@@ -6,6 +6,7 @@ from tempfile import gettempdir
 import json
 import streamsx.spl.op
 import streamsx.spl.types
+import string
 import random
 from streamsx.topology.schema import CommonSchema
 from streamsx.eventstreams.schema import Schema
@@ -169,7 +170,7 @@ def subscribe(topology, topic, schema, group=None, credentials=None, name=None):
         # msg_attr_name = 'message'
         pass
     else:
-        raise ValueError(schema)
+        raise TypeError(schema)
 
     if group is None:
         group = streamsx.spl.op.Expression.expression('getJobName() + "_" + "' + str(topic) + '"')
@@ -220,7 +221,7 @@ def publish(stream, topic, credentials=None, name=None):
         # msg_attr_name = 'message'
         pass
     else:
-        raise ValueError(streamSchema)
+        raise TypeError(streamSchema)
 
     # check if it's the credentials for the service
     if isinstance(credentials, dict):
