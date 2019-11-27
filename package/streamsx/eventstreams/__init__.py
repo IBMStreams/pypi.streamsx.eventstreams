@@ -39,11 +39,11 @@ Credentials Sample::
         schema=CommonSchema.String, credentials=myCredentials)
 
 
-By default an application configuration named `messagehub` is used,
+By default an application configuration named `eventstreams` is used,
 a different configuration can be specified using the ``credentials``
 parameter to :py:func:`subscribe` or :py:func:`publish`.
 
-The application configuration must contain the property ``messagehub.creds`` with a value of the raw Event Streams service credentials JSON.
+The application configuration must contain the property ``eventstreams.creds`` with a value of the raw Event Streams service credentials JSON.
 
 Messages
 ++++++++
@@ -95,7 +95,7 @@ a topic and the same application consuming the same topic::
 
 """
 
-__version__ = '1.3.2'
+__version__ = '1.4.0'
 
 __all__ = [
     'download_toolkit',
