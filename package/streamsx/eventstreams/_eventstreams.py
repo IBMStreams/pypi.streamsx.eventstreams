@@ -189,6 +189,11 @@ def subscribe(topology, topic, schema, group=None, credentials=None, name=None):
         _op.params['credentials'] = json.dumps(credentials)
         # credentials parameter requires 1.7.0
         _add_toolkit_dependency(topology, '1.7.0')
+    else:
+        # when using an app config make sure that the app config 
+        # created with configure_connection(...) is understood by the toolkit
+        # (versions 2.0.0 and 2.0.1 have critical bugs -- request 2.0.2)
+        _add_toolkit_dependency(topology, '2.0.2')
 
     return _op.stream
 
@@ -236,6 +241,11 @@ def publish(stream, topic, credentials=None, name=None):
         _op.params['credentials'] = json.dumps(credentials)
         # credentials parameter requires 1.7.0
         _add_toolkit_dependency(stream.topology, '1.7.0')
+    else:
+        # when using an app config make sure that the app config 
+        # created with configure_connection(...) is understood by the toolkit
+        # (versions 2.0.0 and 2.0.1 have critical bugs -- request 2.0.2)
+        _add_toolkit_dependency(topology, '2.0.2')
 
     # create the input attribute expressions after operator _op initialization
     if msg_attr_name is not None:
