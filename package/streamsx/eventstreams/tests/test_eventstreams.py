@@ -23,7 +23,7 @@ import shutil
 ## ----------------
 ##
 ## Streaming analytics service has:
-##    application config 'messagehub' configured for Eventstreams service
+##    application config 'eventstreams' configured for Eventstreams service
 ##
 ## MessageHub toolkit can be found in path ${EVENTSTREAMS_TOOLKIT_HOME} and is at least 1.5.1
 ##
@@ -273,9 +273,9 @@ class TestMH(TestCase):
 #        uid = str(uuid.uuid4())
 #        s = topo.source(StringData(uid, n)).as_string()
 #        print ('test_string_creds')
-#        evstr.publish(s, 'MH_TEST', credentials='messagehub')
+#        evstr.publish(s, 'MH_TEST', credentials='eventstreams')
 
-#        r = evstr.subscribe(topo, 'MH_TEST', CommonSchema.String, credentials='messagehub')
+#        r = evstr.subscribe(topo, 'MH_TEST', CommonSchema.String, credentials='eventstreams')
 #        r = r.filter(lambda t : t.startswith(uid))
 #        expected = list(StringData(uid, n, False)())
 

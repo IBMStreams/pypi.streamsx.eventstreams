@@ -107,11 +107,11 @@ class Schema:
                                       'key': reading['sensor_id']},
                 name="ToKeyedMessage",
                 schema=Schema.StringMessage)
-        # assume, we have created an application configuration with name 'messagehub'
+        # assume, we have created an application configuration with name 'eventstreams'
         eventStreamsSink = evst.publish(
             sensorStream,
             topic="threePartitionTopic1",
-            credentials='messagehub',
+            credentials='eventstreams',
             name="SensorPublish")
         
         
@@ -125,7 +125,7 @@ class Schema:
             topic="threePartitionTopic1",
             schema=consumerSchema,
             group='my_consumer_group',
-            credentials='messagehub',
+            credentials='eventstreams',
             name="SensorSubscribe"
             ).set_parallel(3).end_parallel()
         

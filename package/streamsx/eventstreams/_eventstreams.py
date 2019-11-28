@@ -15,11 +15,11 @@ from streamsx.toolkits import download_toolkit
 _TOOLKIT_NAME = 'com.ibm.streamsx.messagehub'
 
 
-def _add_toolkit_dependency(topo):
+def _add_toolkit_dependency(topo, minVersion):
     # IMPORTANT: Dependency of this python wrapper to a specific toolkit version
     # This is important when toolkit is not set with streamsx.spl.toolkit.add_toolkit (selecting toolkit from remote build service)
     # messagehub toolkit >= 1.7.0 support the 'credentials' parameter were we can pass JSON directly to the operators
-    streamsx.spl.toolkit.add_toolkit_dependency(topo, _TOOLKIT_NAME, '[1.7.0,99.0.0]')
+    streamsx.spl.toolkit.add_toolkit_dependency(topo, _TOOLKIT_NAME, '[' + minVersion + ',99.0.0]')
 
 
 def _generate_random_digits(len=10):
@@ -30,7 +30,7 @@ def _add_credentials_file(topology, credentials):
     """
     Adds a file dependency to the topology.
     The file contains the credentials as JSON.
-    The filename in the bundle is ``etc/eventstreams.json``.
+    The filename in the bundle is ``etc/eventstreams-12-random-digits.json``.
     """
     if credentials is None:
         raise TypeError(credentials)
@@ -81,7 +81,7 @@ def download_toolkit(url=None, target_dir=None):
     return _toolkit_location
 
 
-def configure_connection(instance, name='messagehub', credentials=None):
+def configure_connection(instance, name='eventstreams', credentials=None):
     """Configures IBM Streams for a certain connection.
 
 
@@ -103,7 +103,7 @@ def configure_connection(instance, name='messagehub', credentials=None):
 
     Args:
         instance(streamsx.rest_primitives.Instance): IBM Streams instance object.
-        name(str): Name of the application configuration, default name is 'messagehub'.
+        name(str): Name of the application configuration, default name is 'eventstreams'.
         credentials(str|dict): The service credentials for Eventstreams.
     Returns:
         Name of the application configuration.
@@ -118,9 +118,9 @@ def configure_connection(instance, name='messagehub', credentials=None):
         raise TypeError(credentials)
 
     if isinstance(credentials, dict):
-        properties['messagehub.creds'] = json.dumps(credentials)
+        properties['eventstreams.creds'] = json.dumps(credentials)
     else:
-        properties['messagehub.creds'] = credentials
+        properties['eventstreams.creds'] = credentials
 
     # check if application configuration exists
     app_config = instance.get_application_configurations(name=name)
@@ -143,8 +143,8 @@ def subscribe(topology, topic, schema, group=None, credentials=None, name=None):
         topology(Topology): Topology that will contain the stream of messages.
         topic(str): Topic to subscribe messages from.
         schema(StreamSchema): Schema for returned stream.
-        group(str): Kafka consumer group identifier. When not specified it default to the job name with `topic` appended separated by an underscore.
-        credentials(dict|str): Credentials in JSON or name of the application configuration containing the credentials for the Event Streams service. When set to ``None`` the application configuration ``messagehub`` is used.
+        group(str): Kafka consumer group identifier. When not specified it default to the job name with `topic` appended separated by an underscore, so that multiple ``subscribe`` calls with the same topic in one topology automatically build a consunsumer group.
+        credentials(dict|str): Credentials in JSON or name of the application configuration containing the credentials for the Event Streams service. When set to ``None`` the application configuration ``eventstreams`` is used.
         name(str): Consumer name in the Streams context, defaults to a generated name.
 
     Returns:
@@ -186,7 +186,9 @@ def subscribe(topology, topic, schema, group=None, credentials=None, name=None):
 
     _op = _MessageHubConsumer(topology, schema=schema, outputMessageAttributeName=msg_attr_name, appConfigName=appConfigName, topic=topic, groupId=group, name=name)
     if (appConfigName is None) and (credentials is not None):
-        _op.params['messageHubCredentialsFile'] = _add_credentials_file(topology, credentials)
+        _op.params['credentials'] = json.dumps(credentials)
+        # credentials parameter requires 1.7.0
+        _add_toolkit_dependency(topology, '1.7.0')
 
     return _op.stream
 
@@ -200,7 +202,7 @@ def publish(stream, topic, credentials=None, name=None):
     Args:
         stream(Stream): Stream of tuples to published as messages.
         topic(str): Topic to publish messages to.
-        credentials(dict|str): Credentials in JSON or name of the application configuration containing the credentials for the Event Streams service. When set to ``None`` the application configuration ``messagehub`` is used.
+        credentials(dict|str): Credentials in JSON or name of the application configuration containing the credentials for the Event Streams service. When set to ``None`` the application configuration ``eventstreams`` is used.
         name(str): Producer name in the Streams context, defaults to a generated name.
 
     Returns:
@@ -231,7 +233,9 @@ def publish(stream, topic, credentials=None, name=None):
 
     _op = _MessageHubProducer(stream, appConfigName=appConfigName, topic=topic, name=name)
     if (appConfigName is None) and (credentials is not None):
-        _op.params['messageHubCredentialsFile'] = _add_credentials_file(stream.topology, credentials)
+        _op.params['credentials'] = json.dumps(credentials)
+        # credentials parameter requires 1.7.0
+        _add_toolkit_dependency(stream.topology, '1.7.0')
 
     # create the input attribute expressions after operator _op initialization
     if msg_attr_name is not None:
@@ -253,7 +257,7 @@ class _MessageHubConsumer(streamsx.spl.op.Source):
                  vmArg=None,
                  appConfigName=None,
                  clientId=None,
-                 messageHubCredentialsFile=None,
+                 credentialsFile=None,
                  outputKeyAttributeName=None,
                  outputMessageAttributeName=None,
                  outputTimestampAttributeName=None,
@@ -263,7 +267,8 @@ class _MessageHubConsumer(streamsx.spl.op.Source):
                  partition=None,
                  propertiesFile=None,
                  startPosition=None,
-                 startTime=None,topic=None,
+                 startTime=None,
+                 topic=None,
                  triggerCount=None,
                  userLib=None,
                  groupId=None,
@@ -278,8 +283,8 @@ class _MessageHubConsumer(streamsx.spl.op.Source):
             params['appConfigName'] = appConfigName
         if clientId is not None:
             params['clientId'] = clientId
-        if messageHubCredentialsFile is not None:
-            params['messageHubCredentialsFile'] = messageHubCredentialsFile
+        if credentialsFile is not None:
+            params['credentialsFile'] = credentialsFile
         if outputKeyAttributeName is not None:
             params['outputKeyAttributeName'] = outputKeyAttributeName
         if outputMessageAttributeName is not None:
@@ -315,7 +320,7 @@ class _MessageHubProducer(streamsx.spl.op.Sink):
     def __init__(self, stream,
                  vmArg=None,
                  appConfigName=None,
-                 messageHubCredentialsFile=None,
+                 credentialsFile=None,
                  propertiesFile=None,
                  topic=None,
                  userLib=None,
@@ -327,8 +332,8 @@ class _MessageHubProducer(streamsx.spl.op.Sink):
             params['vmArg'] = vmArg
         if appConfigName is not None:
             params['appConfigName'] = appConfigName
-        if messageHubCredentialsFile is not None:
-            params['messageHubCredentialsFile'] = messageHubCredentialsFile
+        if credentialsFile is not None:
+            params['credentialsFile'] = credentialsFile
         if propertiesFile is not None:
             params['propertiesFile'] = propertiesFile
         if topic is not None:
