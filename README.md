@@ -49,7 +49,7 @@ When the documented sample must be changed, change it here:
 ## Test
 
 Package can be tested with TopologyTester using the Streaming Analytics service and Event Streams service on IBM Cloud.
-Use Python 3.5 for tests with Streaming Analytics!
+Use Python 3.6 for tests with Streaming Analytics!
 
 | Environment variable | content |
 | --- | --- |
