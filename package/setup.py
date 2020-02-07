@@ -5,7 +5,7 @@ setup(
     packages = ['streamsx.eventstreams'],
     include_package_data=True,
     version = streamsx.eventstreams.__version__,
-    description = 'IBM Streams Event Streams integration',
+    description = 'IBM Streams Event Streams integration for IBM Streams topology applications',
     long_description = open('DESC.txt').read(),
     author = 'IBM Streams @ github.com',
     author_email = 'rolef.heinrich@de.ibm.com',

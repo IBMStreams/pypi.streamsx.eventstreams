@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-IBM Streams Event Streams integration
-=====================================
+IBM Streams Event Streams integration in IBM Streams topology applications
+==========================================================================
 
 .. automodule:: streamsx.eventstreams
 .. automodule:: streamsx.eventstreams.schema

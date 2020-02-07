@@ -1,10 +1,15 @@
 Overview
 ========
 
-Provides functions to read messages from Event Streams as a stream
+Provides functions to read messages from IBM Event Streams as a stream
 and publish tuples to Event Streams as messages.
 
-`IBM® Event Streams <https://www.ibm.com/cloud/event-streams>`_ is a fully managed, cloud-based messaging service. Built on Apache Kafka, IBM Event Streams is a high-throughput, fault-tolerant, event management platform that helps you build intelligent, responsive, event-driven applications.
+`IBM® Event Streams <https://www.ibm.com/cloud/event-streams>`_ is a fully managed, cloud-based messaging service.
+Built on Apache Kafka, IBM Event Streams is a high-throughput, fault-tolerant, event management platform that helps 
+you build intelligent, responsive, event-driven applications.
+
+You may also review the `streamsx.kafka package <https://pypi.org/project/streamsx.kafka/>`_. to integrate 
+IBM Event Streams cloud service with your IBM Streams topology applications.
 
 Sample
 ======
