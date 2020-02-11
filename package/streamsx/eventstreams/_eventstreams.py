@@ -8,6 +8,7 @@ import streamsx.spl.op
 import streamsx.spl.types
 import string
 import random
+import os
 from streamsx.topology.schema import CommonSchema
 from streamsx.eventstreams.schema import Schema
 from streamsx.toolkits import download_toolkit
@@ -36,12 +37,12 @@ def _add_credentials_file(topology, credentials):
         raise TypeError(credentials)
     file_name = 'eventstreams-' + _generate_random_digits(12) + '.json'
     tmpdirname = gettempdir()
-    tmpfile = tmpdirname + '/' + file_name
+    tmpfile = os.path.join(tmpdirname, file_name)
     with open(tmpfile, "w") as json_file:
         json_file.write(json.dumps(credentials))
 
     topology.add_file_dependency(tmpfile, 'etc')
-    fName = 'etc/'+file_name
+    fName = 'etc/'+ file_name
     print("Adding file dependency " + fName + " to the topology " + topology.name)
     return fName
 
